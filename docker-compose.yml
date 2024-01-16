@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  db-monitor:
+    image: postgres
+    container_name: db-monitor-container
+    restart: on-failure
+    ports:
+      - "5435:5432"
+    environment: 
+      POSTGRES_DB: MonitorDB
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    networks:
+      - ds-management-network
+  app:
+    hostname: monitoring-service
+    restart: on-failure
+    depends_on:
+      - db-monitor
+      - rabbitmq
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: monitoring-management-container
+    ports:
+      - "8041:8040"
+    environment:
+      - SPRING_PROFILES_ACTIVE=local-docker
+      - DB_IP=db-monitor
+      - RABBITMQ_IP=rabbitmq
+    networks:
+      - ds-management-network
+  rabbitmq:
+    container_name: rabbitmq
+    hostname: rabbitmq
+    restart: on-failure
+    image: rabbitmq:3.12.11-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - ds-management-network
+
+networks:
+  ds-management-network:
+    external: true

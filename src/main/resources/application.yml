@@ -1,0 +1,30 @@
+server:
+  port: 8040
+
+spring:
+  application:
+    name: monitor-management
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DB_IP:localhost}:5432/MonitorDB
+    username: admin
+    password: admin
+  rabbitmq:
+    host: ${RABBITMQ_IP:localhost}
+    port: 5672
+    username: guest
+    password: guest
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+rabbitmq:
+  queue:
+    device: device_queue
+    sensor: sensor_queue
+  exchange:
+    name: sensor_exchange
+  routing:
+    device: device_routing_key
+    sensor: sensor_routing_key
